@@ -584,7 +584,7 @@ declare module 'klasa' {
 		public default: any;
 		public min: number | null;
 		public max: number | null;
-		public filter: ((client: KlasaClient, value: any, guild?: KlasaGuild) => boolean) | null;
+		public filter: ((client: KlasaClient, value: any, schema: SchemaPiece, language: Language) => boolean) | null;
 		public parse<T>(value: any, guild?: KlasaGuild): T;
 		public edit(options?: SchemaPieceEditOptions): this;
 		public toJSON(): SchemaPieceOptions;
