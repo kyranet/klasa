@@ -1516,7 +1516,7 @@ declare module 'klasa' {
 		default?: any;
 		min?: number;
 		max?: number;
-		filter?: (value: any, guild?: KlasaGuild) => void;
+		filter?: ((client: KlasaClient, value: any, schema: SchemaPiece, language: Language) => boolean) | null
 	};
 
 	export type SchemaPieceEditOptions = {
