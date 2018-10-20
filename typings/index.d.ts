@@ -663,7 +663,7 @@ declare module 'klasa' {
 	}
 
 	export abstract class Event extends Piece {
-		public constructor(client: KlasaClient, store: EventStore, file: string, directory: string, options?: EventOptions);
+		public constructor(client: KlasaClient, store: EventStore, file: string[], directory: string, options?: EventOptions);
 		public emitter: NodeJS.EventEmitter;
 		public event: string;
 		public once: boolean;
@@ -679,7 +679,7 @@ declare module 'klasa' {
 	}
 
 	export abstract class Extendable extends Piece {
-		public constructor(client: KlasaClient, store: ExtendableStore, file: string, directory: string, options?: ExtendableOptions);
+		public constructor(client: KlasaClient, store: ExtendableStore, file: string[], directory: string, options?: ExtendableOptions);
 		public readonly appliesTo: Array<Constructable<any>>;
 		private staticPropertyDescriptors: PropertyDescriptorMap;
 		private instancePropertyDescriptors: PropertyDescriptorMap;
@@ -688,13 +688,13 @@ declare module 'klasa' {
 	}
 
 	export abstract class Finalizer extends Piece {
-		public constructor(client: KlasaClient, store: FinalizerStore, file: string, directory: string, options?: FinalizerOptions);
+		public constructor(client: KlasaClient, store: FinalizerStore, file: string[], directory: string, options?: FinalizerOptions);
 		public abstract run(message: KlasaMessage, response: KlasaMessage | KlasaMessage[] | null, runTime: Stopwatch): void;
 		public toJSON(): PieceFinalizerJSON;
 	}
 
 	export abstract class Inhibitor extends Piece {
-		public constructor(client: KlasaClient, store: InhibitorStore, file: string, directory: string, options?: InhibitorOptions);
+		public constructor(client: KlasaClient, store: InhibitorStore, file: string[], directory: string, options?: InhibitorOptions);
 		public spamProtection: boolean;
 
 		public abstract run(message: KlasaMessage, command: Command): Promise<void | string>;
@@ -702,7 +702,7 @@ declare module 'klasa' {
 	}
 
 	export abstract class Language extends Piece {
-		public constructor(client: KlasaClient, store: LanguageStore, file: string, directory: string, options?: LanguageOptions);
+		public constructor(client: KlasaClient, store: LanguageStore, file: string[], directory: string, options?: LanguageOptions);
 		public language: ObjectLiteral<string | string[] | ((...args: any[]) => string | string[])>;
 
 		public get<T = string>(term: string, ...args: any[]): T;
@@ -710,7 +710,7 @@ declare module 'klasa' {
 	}
 
 	export abstract class Monitor extends Piece {
-		public constructor(client: KlasaClient, store: MonitorStore, file: string, directory: string, options?: MonitorOptions);
+		public constructor(client: KlasaClient, store: MonitorStore, file: string[], directory: string, options?: MonitorOptions);
 		public ignoreBots: boolean;
 		public ignoreEdits: boolean;
 		public ignoreOthers: boolean;
@@ -730,7 +730,7 @@ declare module 'klasa' {
 	}
 
 	export abstract class Provider extends Piece {
-		public constructor(client: KlasaClient, store: ProviderStore, file: string, directory: string, options?: ProviderOptions);
+		public constructor(client: KlasaClient, store: ProviderStore, file: string[], directory: string, options?: ProviderOptions);
 		public abstract create<T = any>(table: string, entry: string, data: any): Promise<T>;
 		public abstract createTable<T = any>(table: string, rows?: any[]): Promise<T>;
 		public abstract delete<T = any>(table: string, entry: string): Promise<T>;
@@ -762,13 +762,13 @@ declare module 'klasa' {
 	}
 
 	export abstract class Task extends Piece {
-		public constructor(client: KlasaClient, store: TaskStore, file: string, directory: string, options?: TaskOptions);
+		public constructor(client: KlasaClient, store: TaskStore, file: string[], directory: string, options?: TaskOptions);
 		public abstract run(data: any): Promise<void>;
 		public toJSON(): PieceTaskJSON;
 	}
 
 	export abstract class Serializer extends AliasPiece {
-		public constructor(client: KlasaClient, store: SerializerStore, file: string, directory: string, options?: SerializerOptions);
+		public constructor(client: KlasaClient, store: SerializerStore, file: string[], directory: string, options?: SerializerOptions);
 		public serialize(data: any): PrimitiveType;
 		public stringify(data: any): string;
 		public toJSON(): PieceSerializerJSON;
