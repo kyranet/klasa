@@ -1777,7 +1777,7 @@ declare module 'klasa' {
 		style?: KlasaConsoleStyleTypes;
 		text?: KlasaConsoleColorTypes;
 	};
-	
+
 	export type KlasaConsoleShardObject = {
 		background?: KlasaConsoleColorTypes;
 		style?: KlasaConsoleStyleTypes;
