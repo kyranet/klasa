@@ -139,7 +139,7 @@ class SQLProvider extends Provider {
 	 */
 	parseValue(value, schemaEntry) {
 		if (typeof value === 'undefined') return schemaEntry.default;
-		if (schemaEntry.array) {
+		if (schemaEntry.group) {
 			if (value === null) return schemaEntry.default;
 			if (typeof value === 'string') value = tryParse(value);
 			if (!Array.isArray(value)) throw new Error(`Could not parse ${value} to an array. Returned empty array instead.`);

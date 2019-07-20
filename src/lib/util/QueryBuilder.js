@@ -147,7 +147,7 @@ class QueryBuilder extends Map {
 		const datatype = this.get(schemaEntry.type) || null;
 		const parsedDefault = this.serialize(schemaEntry.default, schemaEntry, datatype);
 		const type = typeof datatype.type === 'function' ? datatype.type(schemaEntry) : datatype.type;
-		const parsedDatatype = schemaEntry.array ? datatype.array(type) : type;
+		const parsedDatatype = schemaEntry.group ? datatype.array(type) : type;
 		return datatype.formatDatatype(schemaEntry.path, parsedDatatype, parsedDefault);
 	}
 
@@ -161,12 +161,12 @@ class QueryBuilder extends Map {
 	 */
 	serialize(value, schemaEntry, datatype = this.get(schemaEntry.type)) {
 		if (!datatype) throw new Error(`The type '${schemaEntry.type}' is unavailable, please set its definition.`);
-		if (schemaEntry.array && !datatype.array) throw new Error(`The datatype '${datatype.type}' does not support arrays.`);
+		if (schemaEntry.group && !datatype.array) throw new Error(`The datatype '${datatype.type}' does not support arrays.`);
 
 		// If value is null, there is nothing to resolve.
 		if (value === null) return null;
 
-		return schemaEntry.array ?
+		return schemaEntry.group ?
 			datatype.arraySerializer(value, schemaEntry, datatype.serializer) :
 			datatype.serializer(value, schemaEntry);
 	}

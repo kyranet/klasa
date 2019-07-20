@@ -1,5 +1,5 @@
 const { isObject, objectToTuples, arraysStrictEquals, toTitleCase, mergeObjects, makeObject, resolveGuild } = require('../util/util');
-const SettingsArray = require('./group/SettingsArray');
+const GroupBase = require('./group/GroupBase');
 const Type = require('../util/Type');
 
 /**
@@ -198,6 +198,7 @@ class SettingsFolder extends Map {
 		// Queue updates
 		const results = [];
 		for (const [path, entry] of values) {
+			// TODO(UnseenFaith | kyranet): This has to be updated and use group instead
 			if (entry.array ? arraysStrictEquals(this.get(path), entry.default) : this.get(path) === entry.default) continue;
 			results.push({ key: path, value: entry.default, entry });
 		}
@@ -268,6 +269,7 @@ class SettingsFolder extends Map {
 					const keys = options.onlyConfigurable ? entry.configurableKeys : [...entry.keys()];
 					throw keys.length ? language.get('SETTING_GATEWAY_CHOOSE_KEY', keys.join('\', \'')) : language.get('SETTING_GATEWAY_UNCONFIGURABLE_FOLDER');
 				}
+				// TODO(kyranet): Time to remember what this was
 				if (!entry.array && Array.isArray(value[1])) {
 					throw language.get('SETTING_GATEWAY_KEY_NOT_ARRAY', key);
 				}
@@ -288,6 +290,7 @@ class SettingsFolder extends Map {
 		// Queue updates
 		const results = [];
 		for (const [path, previous, value, entry] of values) {
+			// TODO(UnseenFaith | kyranet): This has to be updated and use group instead
 			if (entry.array ? arraysStrictEquals(value, previous) : value === previous) continue;
 			results.push({ key: path, value, entry });
 		}
@@ -309,6 +312,7 @@ class SettingsFolder extends Map {
 		if (entry.type !== 'Folder') {
 			const value = path ? this.get(this.schema.path ? entry.path.slice(this.schema.path + 1) : entry.path) : this;
 			if (value === null) return 'Not set';
+			// TODO(UnseenFaith): Groups need a display method
 			if (entry.array) return value.length ? `[ ${value.map(val => entry.serializer.stringify(val, message)).join(' | ')} ]` : 'None';
 			return entry.serializer.stringify(value, message);
 		}
@@ -379,6 +383,7 @@ class SettingsFolder extends Map {
 		if (isArray) next = await Promise.all(next.map(async val => entry.serializer.serialize(await entry.parse(val, options.guild))));
 		else next = entry.serializer.serialize(await entry.parse(next, options.guild));
 
+		// TODO(UnseenFaith): Move all this logic to the groups
 		if (!entry.array) return next;
 		if (!isArray) next = [next];
 
@@ -435,7 +440,7 @@ class SettingsFolder extends Map {
 			if (typeof subkey === 'undefined') continue;
 
 			// Patch recursively if the key is a folder, set otherwise
-			if (subkey instanceof SettingsFolder || subkey instanceof SettingsArray) subkey._patch(value);
+			if (subkey instanceof SettingsFolder || subkey instanceof GroupBase) subkey._patch(value);
 			else super.set(key, value);
 		}
 	}
@@ -485,10 +490,11 @@ class SettingsFolder extends Map {
 				const settings = new SettingsFolder(value);
 				folder.set(key, settings);
 				this.init(settings, value);
-			} else if (value.array) {
-				const sArray = new SettingsArray(value);
-				sArray.base = this;
-				folder.set(key, sArray);
+			} else if (value.group) {
+				// eslint-disable-next-line new-cap
+				const group = new value.group(value);
+				group.base = this;
+				folder.set(key, group);
 			} else {
 				folder.set(key, value.default);
 			}
