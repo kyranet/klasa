@@ -13,7 +13,6 @@ class SchemaEntry {
 	 * @typedef {Object} SchemaEntryOptions
 	 * @property {*} [default] The default value for the key
 	 * @property {Function} [filter] The filter to use when resolving this key. The function is passed the resolved value from the resolver, and a guild.
-	 * @property {?GroupBase} [group] The group that holds this instance
 	 * @property {boolean} [configurable] Whether the key should be configurable by the configuration command or not
 	 * @property {number} [min] The minimum value for this entry
 	 * @property {number} [max] The maximum value for this entry
@@ -79,18 +78,18 @@ class SchemaEntry {
 		this.type = type.toLowerCase();
 
 		/**
-		 * The group class that stores data for this group, `null` for single valuues
-		 * @since 0.5.0
-		 * @type {?Function}
-		 */
-		this.group = 'group' in options ? options.group : this._inferGroupFromDefault(options.default);
-
-		/**
 		 * The default data this key will revert back to if reset, or if the key is never set
 		 * @since 0.5.0
 		 * @type {*}
 		 */
-		this.default = 'default' in options ? options.default : this._generateDefault();
+		this.default = 'default' in options ? options.default : null;
+
+		/**
+		 * The group class that stores data for this group, `null` for single valuues
+		 * @since 0.5.0
+		 * @type {?Function}
+		 */
+		this.group = this._inferGroupFromDefault();
 
 		/**
 		 * The minimum value for this key.
@@ -190,15 +189,6 @@ class SchemaEntry {
 		// Check filter
 		if (this.filter !== null && !isFunction(this.filter)) throw new TypeError(`[KEY] ${this.path} - Parameter filter must be a function`);
 
-		// Check default
-		if (this.group) {
-			// TODO(kyranet): Add static `GroupBase.validate`?
-			// const reason = this.group.validate(this.default);
-			// if (reason) throw new TypeError(`[DEFAULT] ${this.path} - ${reason}.`);
-		} else if (this.default !== null) {
-			if (['boolean', 'string'].includes(this.type) && typeof this.default !== this.type) throw new TypeError(`[DEFAULT] ${this.path} - Default key must be a ${this.type}.`);
-		}
-
 		return true;
 	}
 
@@ -241,8 +231,6 @@ class SchemaEntry {
 	 * @private
 	 */
 	_generateDefault() {
-		// TODO(kyranet): How do we generate the defaults?
-		// if (this.array) return [];
 		if (this.type === 'boolean') return false;
 		return null;
 	}
@@ -254,10 +242,10 @@ class SchemaEntry {
 	 * @returns {Function}
 	 * @private
 	 */
-	_inferGroupFromDefault(defaultValue) {
-		if (Array.isArray(defaultValue)) return SettingsArray;
-		if (defaultValue instanceof Map) return SettingsMap;
-		// if (defaultValue instanceof Set) return SettingsSet;
+	_inferGroupFromDefault() {
+		if (Array.isArray(this.default)) return SettingsArray;
+		if (this.default instanceof Map) return SettingsMap;
+		// if (this.default instanceof Set) return SettingsSet;
 		return null;
 	}
 

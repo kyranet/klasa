@@ -264,42 +264,6 @@ class Util {
 	}
 
 	/**
-	 * Compare if both arrays are strictly equal
-	 * @since 0.5.0
-	 * @param {any[]} arr1 The first array to compare
-	 * @param {any[]} arr2 The second array to compare
-	 * @returns {boolean}
-	 */
-	static arraysStrictEquals(arr1, arr2) {
-		if (arr1 === arr2) return true;
-		if (arr1.length !== arr2.length) return false;
-
-		for (let i = 0; i < arr1.length; i++) {
-			if (arr1[i] !== arr2[i]) return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Compare if both maps are strictly equal
-	 * @since 0.5.0
-	 * @param {Map<any, any>} map1 The first map to compare
-	 * @param {Map<any, any>} map2 The second map to compare
-	 * @returns {boolean}
-	 */
-	static mapsStrictEquals(map1, map2) {
-		if (map1 === map2) return true;
-		if (map1.size !== map2.size) return false;
-
-		for (const [key, value] of map1.entries()) {
-			if (!map2.has(key)) return false;
-			if (map2.get(key) !== value) return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Sets default properties on an object that aren't already specified.
 	 * @since 0.5.0
 	 * @param {Object} def Default properties

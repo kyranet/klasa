@@ -1,4 +1,4 @@
-const { mapsStrictEquals, resolveGuild } = require('../../util/util');
+const { resolveGuild } = require('../../util/util');
 const GroupBase = require('./GroupBase');
 
 const checkForTuples = (value) => Array.isArray(value) && value.length === 2;
@@ -16,6 +16,18 @@ class SettingsMap extends GroupBase {
 		return this.data.has(key);
 	}
 
+	equals(other) {
+		if (this.data === other) return true;
+		if (this.data.size !== other.size) return false;
+
+		for (const [key, value] of this.data.entries()) {
+			if (!other.has(key)) return false;
+			if (other.get(key) !== value) return false;
+		}
+
+		return true;
+	}
+
 	async update(keyOrEntries, valueOrOptions, options) {
 		const isArray = Array.isArray(keyOrEntries);
 		if (isArray) {
@@ -28,7 +40,7 @@ class SettingsMap extends GroupBase {
 		const clone = await this._parse(clone, entries, guild);
 
 		// The maps were already equal.
-		if (mapsStrictEquals(this.data, clone)) return { errors: [], updated: [] };
+		if (this.equals(clone)) return { errors: [], updated: [] };
 
 		const updated = [{ key: this.entry.path, value: [...clone.entries()], entry: this.entry }];
 		await this._save(updated);

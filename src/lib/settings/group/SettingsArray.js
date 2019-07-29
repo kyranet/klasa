@@ -1,4 +1,5 @@
-const { Type, util: { resolveGuild, arraysStrictEquals, isNumber } } = require('../../util');
+const { isNumber, resolveGuild } = require('../../util/util');
+const Type = require('../../util/Type');
 const GroupBase = require('./GroupBase');
 
 const checkForIndex = (value) => Array.isArray(value) && value.length === 2 && typeof value[0] === 'number';
@@ -21,6 +22,16 @@ class SettingsArray extends GroupBase {
 		return this.data.slice().find(...args);
 	}
 
+	equals(other) {
+		if (this.data === other) return true;
+		if (this.data.length !== other.length) return false;
+
+		for (let i = 0; i < this.data.length; i++) {
+			if (this.data[i] !== other[i]) return false;
+		}
+		return true;
+	}
+
 	async update(values, options) {
 		if (!Array.isArray(values)) values = [values];
 
@@ -37,7 +48,7 @@ class SettingsArray extends GroupBase {
 		const { errors, clone } = await this._parse(values, options, guild, indexing);
 		// This might need to be changed/adjusted to give the user better throw behavior.
 		if (errors.length) throw { errors, updated: [] };
-		if (arraysStrictEquals(this.data, clone)) return { errors: [], updated: [] };
+		if (this.equals(clone)) return { errors: [], updated: [] };
 
 		const result = [{ key: entry.path, value: clone, entry }];
 		this._save(result);

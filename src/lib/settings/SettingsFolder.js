@@ -1,4 +1,4 @@
-const { isObject, objectToTuples, arraysStrictEquals, toTitleCase, mergeObjects, makeObject, resolveGuild } = require('../util/util');
+const { isObject, objectToTuples, toTitleCase, mergeObjects, makeObject, resolveGuild } = require('../util/util');
 const GroupBase = require('./group/GroupBase');
 const Type = require('../util/Type');
 
@@ -198,8 +198,8 @@ class SettingsFolder extends Map {
 		// Queue updates
 		const results = [];
 		for (const [path, entry] of values) {
-			// TODO(UnseenFaith | kyranet): This has to be updated and use group instead
-			if (entry.array ? arraysStrictEquals(this.get(path), entry.default) : this.get(path) === entry.default) continue;
+			const value = this.get(path);
+			if (entry.group ? value.equals(entry.default) : value === entry.default) continue;
 			results.push({ key: path, value: entry.default, entry });
 		}
 
@@ -269,7 +269,6 @@ class SettingsFolder extends Map {
 					const keys = options.onlyConfigurable ? entry.configurableKeys : [...entry.keys()];
 					throw keys.length ? language.get('SETTING_GATEWAY_CHOOSE_KEY', keys.join('\', \'')) : language.get('SETTING_GATEWAY_UNCONFIGURABLE_FOLDER');
 				}
-				// TODO(kyranet): Time to remember what this was
 				if (!entry.array && Array.isArray(value[1])) {
 					throw language.get('SETTING_GATEWAY_KEY_NOT_ARRAY', key);
 				}
@@ -290,8 +289,7 @@ class SettingsFolder extends Map {
 		// Queue updates
 		const results = [];
 		for (const [path, previous, value, entry] of values) {
-			// TODO(UnseenFaith | kyranet): This has to be updated and use group instead
-			if (entry.array ? arraysStrictEquals(value, previous) : value === previous) continue;
+			if (entry.group ? previous.equals(value) : value === previous) continue;
 			results.push({ key: path, value, entry });
 		}
 
