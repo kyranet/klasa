@@ -17,8 +17,6 @@ class SettingsFolder extends Map {
 	/**
 	 * @typedef {SettingsFolderResetOptions} SettingsFolderUpdateOptions
 	 * @property {GuildResolvable} [guild = null] The guild for context in this update
-	 * @property {('add'|'remove'|'auto'|'overwrite')} [arrayAction = 'auto'] The array action to take when updating an array
-	 * @property {number} [arrayIndex = null] The array index to insert the new element in
 	 */
 
 	/**
@@ -223,7 +221,7 @@ class SettingsFolder extends Map {
 	 * message.guild.settings.update('userBlacklist', '272689325521502208');
 	 *
 	 * // Ensuring the function call adds (error if it exists):
-	 * message.guild.settings.update('userBlacklist', '272689325521502208', { arrayAction: 'add' });
+	 * message.guild.settings.update('userBlacklist', '272689325521502208', { action: 'add' });
 	 *
 	 * // Updating it with a json object:
 	 * message.guild.settings.update({ roles: { administrator: '339943234405007361' } });
@@ -386,29 +384,24 @@ class SettingsFolder extends Map {
 		if (!entry.array) return next;
 		if (!isArray) next = [next];
 
-		const { arrayAction = 'auto', arrayIndex = null } = options;
-		if (arrayAction === 'overwrite') return next;
+		const { action = 'auto' } = options;
+		if (action === 'overwrite') return next;
 
 		const clone = previous.slice();
-		if (arrayIndex !== null) {
-			if (arrayIndex < 0 || arrayIndex > previous.length + 1) {
-				throw `The index ${arrayIndex} is bigger than the current array. It must be a value in the range of 0..${previous.length + 1}.`;
-			}
-			[clone[arrayIndex]] = next;
-		} else if (arrayAction === 'auto') {
+		if (action === 'auto') {
 			// Array action auto must add or remove values, depending on their existence
 			for (const val of next) {
 				const index = clone.indexOf(val);
 				if (index === -1) clone.push(val);
 				else clone.splice(index, 1);
 			}
-		} else if (arrayAction === 'add') {
+		} else if (action === 'add') {
 			// Array action add must add values, throw on existent
 			for (const val of next) {
 				if (clone.includes(val)) throw `The value ${val} for the key ${entry.path} already exists.`;
 				clone.push(val);
 			}
-		} else if (arrayAction === 'remove') {
+		} else if (action === 'remove') {
 			// Array action remove must add values, throw on non-existent
 			for (const val of next) {
 				const index = clone.indexOf(val);
@@ -416,7 +409,7 @@ class SettingsFolder extends Map {
 				clone.splice(index, 1);
 			}
 		} else {
-			throw `The ${arrayAction} array action is not a valid SettingsUpdateArrayAction.`;
+			throw `The ${action} array action is not a valid SettingsUpdateArrayAction.`;
 		}
 
 		return clone;

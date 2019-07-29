@@ -166,7 +166,11 @@ class Schema extends Map {
 	 */
 	get(path) {
 		// Map.prototype.get.call was used to avoid infinite recursion
-		return path.split('.').reduce((folder, key) => Map.prototype.get.call(folder, key), this);
+		try {
+			return path.split('.').reduce((folder, key) => Map.prototype.get.call(folder, key), this);
+		} catch {
+			return undefined;
+		}
 	}
 
 

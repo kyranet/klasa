@@ -1226,8 +1226,7 @@ declare module 'klasa' {
 
 	export interface SettingsFolderUpdateOptions extends SettingsFolderResetOptions {
 		guild?: GuildResolvable;
-		arrayAction?: 'add' | 'remove' | 'auto' | 'overwrite';
-		arrayIndex?: number;
+		action?: 'add' | 'remove' | 'auto' | 'overwrite';
 	}
 
 	export interface SettingsFolderUpdateResult {

@@ -38,34 +38,33 @@ module.exports = class extends Command {
 	}
 
 	async set(message, [key, valueToSet]) {
-		const entry = this.check(message, key, await message.guild.settings.update(key, valueToSet, { onlyConfigurable: true, arrayAction: 'add' }));
+		const entry = await this.check(message, key, message.guild.settings.update(key, valueToSet, { onlyConfigurable: true, action: 'add' }));
 		return message.sendLocale('COMMAND_CONF_UPDATED', [key, message.guild.settings.display(message, entry)]);
 	}
 
 	async remove(message, [key, valueToRemove]) {
-		const entry = this.check(message, key, await message.guild.settings.update(key, valueToRemove, { onlyConfigurable: true, arrayAction: 'remove' }));
+		const entry = await this.check(message, key, message.guild.settings.update(key, valueToRemove, { onlyConfigurable: true, action: 'remove' }));
 		return message.sendLocale('COMMAND_CONF_UPDATED', [key, message.guild.settings.display(message, entry)]);
 	}
 
 	async reset(message, [key]) {
-		const entry = this.check(message, key, await message.guild.settings.reset(key));
+		const entry = await this.check(message, key, message.guild.settings.reset(key));
 		return message.sendLocale('COMMAND_CONF_RESET', [key, message.guild.settings.display(message, entry)]);
 	}
 
-	check(message, key, { errors, updated }) {
-		if (errors.length) throw String(errors[0]);
-		if (!updated.length) throw message.language.get('COMMAND_CONF_NOCHANGE', key);
-		return updated[0].entry;
+	async check(message, key, promiseUpdate) {
+		try {
+			const { updated } = await promiseUpdate;
+			if (!updated.length) throw message.language.get('COMMAND_CONF_NOCHANGE', key);
+			return updated[0].entry;
+		} catch (errors) {
+			throw String(errors[0]);
+		}
 	}
 
 	getPath(key) {
 		const { schema } = this.client.gateways.get('guilds');
-		if (!key) return schema;
-		try {
-			return schema.get(key);
-		} catch (__) {
-			return undefined;
-		}
+		return key ? schema.get(key) : schema;
 	}
 
 };
