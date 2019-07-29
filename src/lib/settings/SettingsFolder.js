@@ -79,8 +79,12 @@ class SettingsFolder extends Map {
 	 * const channel = message.guild.settings.get('channels.moderation-logs');
 	 */
 	get(path) {
-		// Map.prototype.get.call was used to avoid infinite recursion
-		return path.split('.').reduce((folder, key) => Map.prototype.get.call(folder, key), this);
+		try {
+			// Map.prototype.get.call was used to avoid infinite recursion
+			return path.split('.').reduce((folder, key) => Map.prototype.get.call(folder, key), this);
+		} catch {
+			return undefined;
+		}
 	}
 
 	/**
