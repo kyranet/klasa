@@ -258,10 +258,12 @@ class SchemaEntry {
 		return {
 			group: this.group ? this.group.name : null,
 			configurable: this.configurable,
-			default: this.default,
+			default: this.group ? [...this.default] : this.default,
 			max: this.max,
 			min: this.min,
-			type: this.type
+			type: this.type,
+			inclusive: this.inclusive,
+			resolve: this.resolve
 		};
 	}
 
